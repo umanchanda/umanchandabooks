@@ -11,5 +11,3 @@ with open('books.csv', 'r') as books:
     for row in reader:
         db.execute("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)", {'isbn': row[0], 'title':row[1], 'author': row[2], 'year': row[3]})
     db.commit()
-
-#register = db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {'username': username, 'password':hashed_password})

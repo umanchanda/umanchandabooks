@@ -1,11 +1,12 @@
 import os
-from flask import Flask, session, render_template, request, redirect
+from flask import Flask, session, render_template, request, redirect, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from helpers import login_required, apology
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
+import requests
 
 app = Flask(__name__)
 
@@ -26,8 +27,8 @@ db = scoped_session(sessionmaker(bind=engine))
 @app.route("/")
 @login_required
 def index():
-    ex = db.execute("SELECT * FROM users")
-    return render_template("index.html", users=ex)
+    books = db.execute("SELECT * FROM books LIMIT 5")
+    return render_template("index.html", books=books)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -89,3 +90,14 @@ def login():
 def logout():
     session.clear()
     return redirect("/")
+
+@app.route("/search")
+@login_required
+def search():
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "1AgC1FgCvS4k7iktD7JqIg", "isbns": "9781632168146"})
+    return(res.json())
+
+@app.route("/review")
+@login_required
+def review():
+    return render_template("review.html")

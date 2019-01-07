@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+    <table class='table table-striped'>
+        <tr>
+            <th>ID</th>
+            <th>username</th>
+            <th>Password</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.password }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

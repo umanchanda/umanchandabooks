@@ -1,5 +1,5 @@
 import os
-from flask import Flask, session, render_template, request, redirect, jsonify
+from flask import Flask, session, render_template, request, redirect
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -7,6 +7,7 @@ from helpers import login_required, apology
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 import requests
+import json
 
 app = Flask(__name__)
 
@@ -46,15 +47,14 @@ def register():
         username = request.form.get("username")
         hashed_password = generate_password_hash(request.form.get("password"))
 
-        check = db.execute("SELECT * FROM users WHERE username=:username", {'username': username}).fetchall()
+        check = db.execute("SELECT * FROM users WHERE username=:username", {'username': username}).fetchone()
 
         if check is None:
-            return apology("Username already exists")
-        
-        register = db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {'username': username, 'password':hashed_password})
-        db.commit()
-        
-        session['user_id'] = register
+            register = db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {'username': username, 'password':hashed_password})
+            db.commit()
+            session['user_id'] = register
+        else:
+            return apology("Username is already taken")
 
         return redirect('/')
     else:
@@ -91,13 +91,23 @@ def logout():
     session.clear()
     return redirect("/")
 
-@app.route("/search")
+@app.route("/api/<isbn>", methods=['GET'])
 @login_required
-def search():
-    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "1AgC1FgCvS4k7iktD7JqIg", "isbns": "9781632168146"})
-    return(res.json())
+def api(isbn):
+    result = db.execute("SELECT * FROM books WHERE isbn=:isbn", {'isbn':isbn}).fetchone()
+
+    if not result:
+        return apology("Invalid ISBN")
+
+    return json.dumps({'title':result[1], 'author':result[2], 'year':result[3], 'isbn':result[0]}, sort_keys=False)
+
 
 @app.route("/review")
 @login_required
 def review():
     return render_template("review.html")
+
+@app.route("/search")
+@login_required
+def search():
+    return render_template("search.html")

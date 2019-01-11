@@ -122,3 +122,6 @@ def test(isbn):
     res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "1AgC1FgCvS4k7iktD7JqIg", "isbns": isbn})
     books = res.json()['books']
     return json.dumps(books)
+
+if __name__ == '__main__':
+    app.run()

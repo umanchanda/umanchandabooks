@@ -1,4 +1,4 @@
 # umanchandabooks
 Uses Flask and Postgresql to create a book review website by querying the Goodreads API
 
-url is `https://umanchandabooks.herokuapp.com`
+URL can be found [here](https://umanchanda.herokuapp.com). 

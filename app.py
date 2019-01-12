@@ -56,7 +56,7 @@ def register():
         else:
             return apology("Username is already taken")
 
-        return redirect('/')
+        return redirect('/login')
     else:
         return render_template("register.html")
 

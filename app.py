@@ -34,6 +34,8 @@ def index():
             return apology("Invalid search query")
         search = "%" + search + "%"
         results = db.execute("SELECT * FROM books WHERE LOWER(title) LIKE :search OR LOWER(author) LIKE :search OR isbn LIKE :search OR year LIKE :search", {'search':search}).fetchall()
+        if len(results) == 0:
+            return apology("Returned no results. Please alter your search query")
         return render_template("search.html",books=results)
     else:
         return render_template("index.html")

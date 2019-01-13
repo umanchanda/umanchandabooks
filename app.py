@@ -28,8 +28,15 @@ db = scoped_session(sessionmaker(bind=engine))
 @app.route("/")
 @login_required
 def index():
-    books = db.execute("SELECT * FROM books LIMIT 5")
-    return render_template("index.html", books=books)
+    if request.method == "POST":
+        if not request.form.get("book"):
+            return apology("Invalid search query")
+    
+        search = "%" + request.method.get("book") + "%"
+        db.execute("SELECT * FROM books WHERE title LIKE :title OR author LIKE :author OR isbn LIKE :isbn", {'title':search, 'author':search, 'isbn':search}).fetchall()
+        return render_template("index.html")
+    else:
+        return render_template("search.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -106,22 +113,22 @@ def api(isbn):
     'review_count': books[0]['reviews_count'], 'average_score':books[0]['average_rating']}, sort_keys=False)
 
 
-@app.route("/review")
-@login_required
-def review():
-    return render_template("review.html")
+# @app.route("/review")
+# @login_required
+# def review():
+#     return render_template("review.html")
 
-@app.route("/search")
-@login_required
-def search():
-    return render_template("search.html")
+# @app.route("/search")
+# @login_required
+# def search():
+#     return render_template("search.html")
 
-@app.route("/test/<isbn>")
-@login_required
-def test(isbn):
-    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "1AgC1FgCvS4k7iktD7JqIg", "isbns": isbn})
-    books = res.json()['books']
-    return json.dumps(books)
+# @app.route("/test/<isbn>")
+# @login_required
+# def test(isbn):
+#     res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "1AgC1FgCvS4k7iktD7JqIg", "isbns": isbn})
+#     books = res.json()['books']
+#     return json.dumps(books)
 
 if __name__ == '__main__':
     app.run()

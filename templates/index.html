@@ -5,20 +5,10 @@
 {% endblock %}
 
 {% block main %}
-    <table class='table table-striped'>
-        <tr>
-            <th>ISBN</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Year</th>
-        </tr>
-        {% for book in books %}
-        <tr>
-            <td>{{ book.isbn }}</td>
-            <td>{{ book.title }}</td>
-            <td>{{ book.author }}</td>
-            <td>{{ book.year }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <form action="/" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="book" placeholder="Book Search" type="text"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
 {% endblock %}

@@ -5,5 +5,22 @@
 {% endblock %}
 
 {% block main %}
-    <h1>HA GAY</h1>
+    <table class='table table-striped'>
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.isbn }}</td>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.year }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

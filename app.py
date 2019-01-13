@@ -25,18 +25,18 @@ engine = create_engine("postgres://wzhyqownmxotta:996a486a693a09dc9427b75e478778
 db = scoped_session(sessionmaker(bind=engine))
 
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 @login_required
 def index():
     if request.method == "POST":
-        if not request.form.get("book"):
+        search = str(request.form.get("book")).lower()
+        if not search:
             return apology("Invalid search query")
-    
-        search = "%" + request.method.get("book") + "%"
-        db.execute("SELECT * FROM books WHERE title LIKE :title OR author LIKE :author OR isbn LIKE :isbn", {'title':search, 'author':search, 'isbn':search}).fetchall()
-        return render_template("index.html")
+        search = "%" + search + "%"
+        results = db.execute("SELECT * FROM books WHERE LOWER(title) LIKE :search OR LOWER(author) LIKE :search OR isbn LIKE :search OR year LIKE :search", {'search':search}).fetchall()
+        return render_template("search.html",books=results)
     else:
-        return render_template("search.html")
+        return render_template("index.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

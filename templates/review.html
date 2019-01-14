@@ -24,8 +24,8 @@
         </tr>
     </table>
     
-    <form action="/" method="post">
-        <select class="custom-select">
+    <form action="/review/{{ isbn }}" method="post">
+        <select class="custom-select" name="review">
             <option selected>How would you rate this book</option>
             <option value="1">One Star</option>
             <option value="2">Two Stars</option>
@@ -35,4 +35,25 @@
         </select>
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
+
+    <p></p>
+    <h2>Previous Reviews</h2>
+    <table class='table table-striped'>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Stars</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Average Rating</th>
+                <th>{{ averageRating }}</th>
+            </tr>
+        </tfoot>
+        <tr>
+            <td>{{ username }}</td>
+            <td>{{ review }}</td>
+        </tr>
+    </table>
 {% endblock %}

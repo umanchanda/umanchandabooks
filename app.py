@@ -123,7 +123,9 @@ def review(isbn):
     if not result:
         return apology("Invalid ISBN")
     
-    return render_template("review.html", isbn=result[0], title=result[1], author=result[2], year=result[3])
+    rating = request.form.get("review")
+    
+    return render_template("review.html", isbn=result[0], title=result[1], author=result[2], year=result[3], averageRating=rating, username=session['username'], review=rating)
 
 if __name__ == '__main__':
     app.run()

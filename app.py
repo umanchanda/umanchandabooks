@@ -59,13 +59,13 @@ def register():
         check = db.execute("SELECT * FROM users WHERE username=:username", {'username': username}).fetchone()
 
         if check is None:
-            register = db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {'username': username, 'password':hashed_password})
+            db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {'username': username, 'password':hashed_password})
             db.commit()
-            session['user_id'] = register
+            session['username'] = username
         else:
             return apology("Username is already taken")
 
-        return redirect('/login')
+        return redirect('/')
     else:
         return render_template("register.html")
 
@@ -88,7 +88,7 @@ def login():
         elif not check_password_hash(check[0]['password'], request.form.get("password")):
             return apology("Incorrect password")
 
-        session['user_id'] = check[0]['id']
+        session['username'] = check[0]['username']
         
         return redirect('/')
 
@@ -115,22 +115,15 @@ def api(isbn):
     'review_count': books[0]['reviews_count'], 'average_score':books[0]['average_rating']}, sort_keys=False)
 
 
-# @app.route("/review")
-# @login_required
-# def review():
-#     return render_template("review.html")
+@app.route("/review/<isbn>", methods=['GET', 'POST'])
+@login_required
+def review(isbn):
+    result = db.execute("SELECT * FROM books WHERE isbn=:isbn", {'isbn':isbn}).fetchone()
 
-# @app.route("/search")
-# @login_required
-# def search():
-#     return render_template("search.html")
-
-# @app.route("/test/<isbn>")
-# @login_required
-# def test(isbn):
-#     res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "1AgC1FgCvS4k7iktD7JqIg", "isbns": isbn})
-#     books = res.json()['books']
-#     return json.dumps(books)
+    if not result:
+        return apology("Invalid ISBN")
+    
+    return render_template("review.html", isbn=result[0], title=result[1], author=result[2], year=result[3])
 
 if __name__ == '__main__':
     app.run()

@@ -5,5 +5,34 @@
 {% endblock %}
 
 {% block main %}
-    <h1>TODO</h1>
+    <h1>Submit a review here</h1>
+    <h2>Book information</h2>
+    <table class='table table-striped'>
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tr>
+            <td>{{ isbn }}</td>
+            <td>{{ title }}</td>
+            <td>{{ author }}</td>
+            <td>{{ year }}</td>
+        </tr>
+    </table>
+    
+    <form action="/" method="post">
+        <select class="custom-select">
+            <option selected>How would you rate this book</option>
+            <option value="1">One Star</option>
+            <option value="2">Two Stars</option>
+            <option value="3">Three Stars</option>
+            <option value="4">Four Stars</option>
+            <option value="5">Five Stars</option>
+        </select>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
 {% endblock %}

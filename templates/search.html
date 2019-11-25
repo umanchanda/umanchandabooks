@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block main %}
+    <table class='table table-striped'>
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>API</th>
+                <th>Submit a review</th>
+            </tr>
+        </thead>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.isbn }}</td>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.year }}</td>
+            <td><a href="/api/{{ book.isbn }}">API information</a></td>
+            <td><a href="/review/{{ book.isbn }}">Submit a review</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

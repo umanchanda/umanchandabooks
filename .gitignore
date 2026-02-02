@@ -59,6 +59,7 @@ db.sqlite3
 # Flask stuff:
 instance/
 .webassets-cache
+flask_session/
 
 # Scrapy stuff:
 .scrapy
@@ -99,3 +100,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# vscode
+.vscode/
+
+keys.txt
+
+Project 1_ Books.html

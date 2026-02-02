@@ -6,8 +6,8 @@
 
 {% block main %}
     <h1>Submit a review here</h1>
-    <h2>Book Information</h2>
-    <table class="table table-striped">
+    <h2>Book information</h2>
+    <table class='table table-striped'>
         <thead>
             <tr>
                 <th>ISBN</th>
@@ -17,25 +17,22 @@
             </tr>
         </thead>
         <tr>
-            <th>{{ isbn }}</th>
-            <th>{{ title }}</th>
-            <th>{{ author }}</th>
-            <th>{{ year }}</th>
+            <td>{{ isbn }}</td>
+            <td>{{ title }}</td>
+            <td>{{ author }}</td>
+            <td>{{ year }}</td>
         </tr>
     </table>
     
     <form action="/review/{{ isbn }}" method="post">
-        <select class="custom-select" name="rating">
-            <option disabled selected value>How would you rate this book</option>
+        <select class="custom-select" name="review">
+            <option selected>How would you rate this book</option>
             <option value="1">One Star</option>
             <option value="2">Two Stars</option>
             <option value="3">Three Stars</option>
             <option value="4">Four Stars</option>
             <option value="5">Five Stars</option>
         </select>
-        <div class="form-group" name="comments">
-            <textarea class="form-control" rows="10" cols="50" name="comments" placeholder="Comments"></textarea>
-          </div>
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
 
@@ -45,23 +42,18 @@
         <thead>
             <tr>
                 <th>Username</th>
-                <th>Rating</th>
-                <th>Comments</th>
+                <th>Stars</th>
             </tr>
         </thead>
         <tfoot>
             <tr>
                 <th>Average Rating</th>
                 <th>{{ averageRating }}</th>
-                <th></th>
             </tr>
         </tfoot>
-        {% for review in reviews %}
         <tr>
-            <td>{{ review.username }}</td>
-            <td>{{ review.rating }}</td>
-            <td>{{ review.comments }}</td>
+            <td>{{ username }}</td>
+            <td>{{ review }}</td>
         </tr>
-        {% endfor %}
     </table>
 {% endblock %}

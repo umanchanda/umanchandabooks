@@ -1,6 +1,6 @@
 import os
 import csv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 if not os.getenv("DATABASE_URL"):
@@ -17,5 +17,5 @@ with open('books.csv', 'r') as books:
     reader = csv.reader(books)
     next(reader)
     for row in reader:
-        db.execute("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)", {'isbn': row[0], 'title': row[1], 'author': row[2], 'year': row[3]})
+        db.execute(text("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)"), {'isbn': row[0], 'title': row[1], 'author': row[2], 'year': row[3]})
     db.commit()

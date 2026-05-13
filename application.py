@@ -1,7 +1,7 @@
 import os
 from flask import Flask, session, render_template, request, redirect
 from flask_session import Session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from helpers import login_required, apology
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -41,7 +41,7 @@ def index():
         if not search:
             return apology("Invalid search query")
         search = "%" + search + "%"
-        results = db.execute("SELECT * FROM books WHERE LOWER(title) LIKE :search OR LOWER(author) LIKE :search OR isbn LIKE :search OR year LIKE :search", {'search': search}).fetchall()
+        results = db.execute(text("SELECT * FROM books WHERE LOWER(title) LIKE :search OR LOWER(author) LIKE :search OR isbn LIKE :search OR year LIKE :search"), {'search': search}).fetchall()
         if len(results) == 0:
             return apology("Returned no results. Please alter your search query")
         return render_template("search.html", books=results)
@@ -64,10 +64,10 @@ def register():
         username = request.form.get("username")
         hashed_password = generate_password_hash(request.form.get("password"))
 
-        check = db.execute("SELECT * FROM users WHERE username=:username", {'username': username}).fetchone()
+        check = db.execute(text("SELECT * FROM users WHERE username=:username"), {'username': username}).fetchone()
 
         if check is None:
-            db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {'username': username, 'password': hashed_password})
+            db.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"), {'username': username, 'password': hashed_password})
             db.commit()
             session['username'] = username
         else:
@@ -88,15 +88,15 @@ def login():
 
         username = request.form.get("username")
 
-        check = db.execute("SELECT * FROM users WHERE username=:username", {'username': username}).fetchall()
+        check = db.execute(text("SELECT * FROM users WHERE username=:username"), {'username': username}).fetchall()
 
         if not check:
             return apology("Username not found")
 
-        elif not check_password_hash(check[0]['password'], request.form.get("password")):
+        elif not check_password_hash(check[0].password, request.form.get("password")):
             return apology("Incorrect password")
 
-        session['username'] = check[0]['username']
+        session['username'] = check[0].username
 
         return redirect('/')
 
@@ -111,7 +111,7 @@ def logout():
 @app.route("/api/<isbn>", methods=['GET'])
 @login_required
 def api(isbn):
-    result = db.execute("SELECT * FROM books WHERE isbn=:isbn", {'isbn': isbn}).fetchone()
+    result = db.execute(text("SELECT * FROM books WHERE isbn=:isbn"), {'isbn': isbn}).fetchone()
 
     if not result:
         return apology("Invalid ISBN")
@@ -133,7 +133,7 @@ def api(isbn):
 @app.route("/review/<isbn>", methods=['GET', 'POST'])
 @login_required
 def review(isbn):
-    result = db.execute("SELECT * FROM books WHERE isbn=:isbn", {'isbn': isbn}).fetchone()
+    result = db.execute(text("SELECT * FROM books WHERE isbn=:isbn"), {'isbn': isbn}).fetchone()
 
     if not result:
         return apology("Invalid ISBN")
@@ -142,15 +142,15 @@ def review(isbn):
         rating = request.form.get("rating")
         comments = request.form.get("comments")
 
-        existing = db.execute("SELECT * FROM reviews WHERE username=:username AND isbn=:isbn", {'username': session['username'], 'isbn': result[0]}).fetchone()
+        existing = db.execute(text("SELECT * FROM reviews WHERE username=:username AND isbn=:isbn"), {'username': session['username'], 'isbn': result[0]}).fetchone()
 
         if not existing:
-            db.execute("INSERT INTO reviews (username, isbn, rating, comments) VALUES (:username, :isbn, :rating, :comments)", {'username': session['username'], 'isbn': result[0], 'rating': rating, 'comments': comments})
+            db.execute(text("INSERT INTO reviews (username, isbn, rating, comments) VALUES (:username, :isbn, :rating, :comments)"), {'username': session['username'], 'isbn': result[0], 'rating': rating, 'comments': comments})
         else:
-            db.execute("UPDATE reviews SET rating=:rating, comments=:comments WHERE username=:username AND isbn=:isbn", {'rating': rating, 'comments': comments, 'username': session['username'], 'isbn': result[0]})
+            db.execute(text("UPDATE reviews SET rating=:rating, comments=:comments WHERE username=:username AND isbn=:isbn"), {'rating': rating, 'comments': comments, 'username': session['username'], 'isbn': result[0]})
         db.commit()
 
-        allReviews = db.execute("SELECT * FROM reviews WHERE isbn=:isbn", {'isbn': result[0]}).fetchall()
+        allReviews = db.execute(text("SELECT * FROM reviews WHERE isbn=:isbn"), {'isbn': result[0]}).fetchall()
         allRatings = [int(i[2]) for i in allReviews if i[2] is not None]
         averageRating = "{0:0.1f}".format(sum(allRatings) / len(allRatings)) if allRatings else "N/A"
 

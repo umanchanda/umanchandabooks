@@ -114,11 +114,18 @@ def api(isbn):
     if not result:
         return apology("Invalid ISBN")
     
-    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "1AgC1FgCvS4k7iktD7JqIg", "isbns": isbn})
-    books = res.json()['books']
+    res = requests.get("https://openlibrary.org/search.json", params={"isbn": isbn, "fields": "ratings_count,ratings_average"})
+    data = res.json()
+    if data.get('numFound', 0) > 0:
+        book_data = data['docs'][0]
+        review_count = book_data.get('ratings_count', 0)
+        average_score = round(book_data.get('ratings_average', 0), 2)
+    else:
+        review_count = 0
+        average_score = 0
 
-    return json.dumps({'title':result[1], 'author':result[2], 'year':result[3], 'isbn':result[0], 
-    'review_count': books[0]['reviews_count'], 'average_score':books[0]['average_rating']}, sort_keys=False)
+    return json.dumps({'title':result[1], 'author':result[2], 'year':result[3], 'isbn':result[0],
+    'review_count': review_count, 'average_score': average_score}, sort_keys=False)
 
 
 @app.route("/review/<isbn>", methods=['GET', 'POST'])

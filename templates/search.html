@@ -1,30 +1,49 @@
 {% extends "layout.html" %}
 
-{% block title %}
-    Search
-{% endblock %}
+{% block title %}— Results{% endblock %}
 
 {% block main %}
-    <table class='table table-striped'>
-        <thead>
-            <tr>
-                <th>ISBN</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Year</th>
-                <th>API</th>
-                <th>Submit a review</th>
-            </tr>
-        </thead>
-        {% for book in books %}
-        <tr>
-            <td>{{ book.isbn }}</td>
-            <td>{{ book.title }}</td>
-            <td>{{ book.author }}</td>
-            <td>{{ book.year }}</td>
-            <td><a href="/api/{{ book.isbn }}">API information</a></td>
-            <td><a href="/review/{{ book.isbn }}">Submit a review</a></td>
-        </tr>
-        {% endfor %}
-    </table>
+<div class="content-section">
+    <div class="container">
+        <div class="results-header">
+            <div>
+                <h2 class="section-title">Search Results</h2>
+                <p class="results-count">{{ books|length }} book{{ 's' if books|length != 1 }} found</p>
+            </div>
+            <a href="/" class="btn-outline-accent">
+                <i class="fa-solid fa-arrow-left"></i> New Search
+            </a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for book in books %}
+            <div class="col">
+                <div class="book-card">
+                    <div class="book-title">{{ book.title }}</div>
+                    <div class="book-author">
+                        <i class="fa-solid fa-pen-nib me-1"></i>{{ book.author or 'Unknown author' }}
+                    </div>
+                    <div>
+                        {% if book.year %}
+                            <span class="badge-year"><i class="fa-regular fa-calendar me-1"></i>{{ book.year }}</span>
+                        {% endif %}
+                        {% if book.genre %}
+                            <span class="badge-genre"><i class="fa-solid fa-tag me-1"></i>{{ book.genre }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="isbn-text">ISBN: {{ book.isbn }}</div>
+                    <div class="card-actions">
+                        <a class="btn-accent" href="/review/{{ book.isbn }}">
+                            <i class="fa-solid fa-star"></i> Review
+                        </a>
+                        <a class="btn-outline-accent" href="/api/{{ book.isbn }}" target="_blank">
+                            <i class="fa-solid fa-code"></i> API
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}

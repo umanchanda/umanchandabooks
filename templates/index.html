@@ -1,15 +1,53 @@
 {% extends "layout.html" %}
 
-{% block title %}
-    Index
-{% endblock %}
+{% block title %}— Search{% endblock %}
 
 {% block main %}
-    <h1>Please search for a book</h1>
-    <form action="/" method="post">
-        <div class="form-group">
-            <input autofocus class="form-control" name="book" placeholder="Book Search" type="text"/>
+<div class="hero">
+    <div class="container">
+        <h1><i class="fa-solid fa-magnifying-glass me-2"></i>Find Your Next Read</h1>
+        <p>Search our library by title, author, genre, or publication year</p>
+
+        <div class="search-card">
+            <form action="/" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="title">Title</label>
+                        <input autofocus class="form-control" id="title" name="title"
+                               placeholder="e.g. The Great Gatsby" type="text"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="author">Author</label>
+                        <input class="form-control" id="author" name="author"
+                               placeholder="e.g. F. Scott Fitzgerald" type="text"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="genre">Genre</label>
+                        <input class="form-control" id="genre" name="genre"
+                               placeholder="e.g. Fiction, Mystery, Sci-Fi" type="text"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="year">Year</label>
+                        <input class="form-control" id="year" name="year"
+                               placeholder="e.g. 1925" type="text"/>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <button class="btn-search w-100" type="submit">
+                            <i class="fa-solid fa-magnifying-glass me-2"></i>Search Books
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-        <button class="btn btn-primary" type="submit">Search</button>
-    </form>
+    </div>
+</div>
+
+<div class="content-section">
+    <div class="container text-center">
+        <p class="text-muted">
+            <i class="fa-solid fa-circle-info me-1"></i>
+            Fill in one or more fields above. All matches are case-insensitive and partial.
+        </p>
+    </div>
+</div>
 {% endblock %}

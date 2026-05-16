@@ -1,71 +1,92 @@
 {% extends "layout.html" %}
 
-{% block title %}
-    Review
-{% endblock %}
+{% block title %}— {{ title }}{% endblock %}
 
 {% block main %}
-    <h1>Submit a review here</h1>
-    <h2>Book information</h2>
-    <table class='table table-striped'>
-        <thead>
-            <tr>
-                <th>ISBN</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Year</th>
-            </tr>
-        </thead>
-        <tr>
-            <td>{{ isbn }}</td>
-            <td>{{ title }}</td>
-            <td>{{ author }}</td>
-            <td>{{ year }}</td>
-        </tr>
-    </table>
+<div class="content-section">
+    <div class="container" style="max-width: 760px;">
 
-    <form action="/review/{{ isbn }}" method="post">
-        <div class="form-group">
-            <select class="custom-select" name="rating">
-                <option selected>How would you rate this book?</option>
-                <option value="1">One Star</option>
-                <option value="2">Two Stars</option>
-                <option value="3">Three Stars</option>
-                <option value="4">Four Stars</option>
-                <option value="5">Five Stars</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <textarea class="form-control" name="comments" placeholder="Leave a comment (optional)" rows="3"></textarea>
-        </div>
-        <button class="btn btn-primary" type="submit">Submit</button>
-    </form>
+        <a href="/" class="btn-outline-accent mb-4 d-inline-flex">
+            <i class="fa-solid fa-arrow-left"></i> Back to Search
+        </a>
 
-    <p></p>
-    <h2>Previous Reviews</h2>
-    <table class='table table-striped'>
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Stars</th>
-                <th>Comments</th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <th>Average Rating</th>
-                <th>{{ averageRating }}</th>
-                <th></th>
-            </tr>
-        </tfoot>
-        <tbody>
-            {% for r in reviews %}
-            <tr>
-                <td>{{ r[0] }}</td>
-                <td>{{ r[2] }}</td>
-                <td>{{ r[3] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <!-- Book detail -->
+        <div class="book-detail-card">
+            <div class="detail-title">{{ title }}</div>
+            <div class="detail-author">{{ author or 'Unknown author' }}</div>
+            <div class="detail-meta">
+                {% if year %}
+                <span><i class="fa-regular fa-calendar"></i>{{ year }}</span>
+                {% endif %}
+                <span><i class="fa-solid fa-barcode"></i>{{ isbn }}</span>
+                <span class="avg-rating-badge">
+                    <i class="fa-solid fa-star star-icon"></i>
+                    {{ averageRating }} avg
+                </span>
+            </div>
+        </div>
+
+        <!-- Review form -->
+        <div class="review-form-card">
+            <h3><i class="fa-solid fa-pen me-2"></i>Leave a Review</h3>
+            <form action="/review/{{ isbn }}" method="post">
+
+                <label class="form-label fw-semibold mb-1">Your Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="s5" name="rating" value="5"/>
+                    <label for="s5" title="5 stars">&#9733;</label>
+                    <input type="radio" id="s4" name="rating" value="4"/>
+                    <label for="s4" title="4 stars">&#9733;</label>
+                    <input type="radio" id="s3" name="rating" value="3"/>
+                    <label for="s3" title="3 stars">&#9733;</label>
+                    <input type="radio" id="s2" name="rating" value="2"/>
+                    <label for="s2" title="2 stars">&#9733;</label>
+                    <input type="radio" id="s1" name="rating" value="1"/>
+                    <label for="s1" title="1 star">&#9733;</label>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="comments">Comments <span class="text-muted fw-normal">(optional)</span></label>
+                    <textarea class="form-control" id="comments" name="comments"
+                              placeholder="What did you think?" rows="3"
+                              style="border-radius:8px; border:1.5px solid var(--color-border);"></textarea>
+                </div>
+
+                <button class="btn-search" type="submit">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Submit Review
+                </button>
+            </form>
+        </div>
+
+        <!-- Previous reviews -->
+        <div class="reviews-section">
+            <h3>
+                <i class="fa-solid fa-comments me-2"></i>All Reviews
+                <span class="text-muted fw-normal fs-6">({{ reviews|length }})</span>
+            </h3>
+
+            {% if reviews %}
+                {% for r in reviews %}
+                <div class="review-item">
+                    <div class="d-flex align-items-center">
+                        <span class="reviewer">{{ r[0] }}</span>
+                        {% if r[2] %}
+                        <span class="stars">
+                            {% for i in range(r[2]|int) %}&#9733;{% endfor %}
+                            {% for i in range(5 - r[2]|int) %}&#9734;{% endfor %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% if r[3] %}
+                    <div class="comment">{{ r[3] }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No reviews yet — be the first!</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
 {% endblock %}

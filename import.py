@@ -3,6 +3,11 @@ import time
 import requests
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 SUBJECTS = [
     'fiction', 'science_fiction', 'mystery', 'biography',
@@ -20,6 +25,21 @@ if database_url.startswith("postgres://"):
 
 engine = create_engine(database_url)
 db = scoped_session(sessionmaker(bind=engine))
+
+# Ensure the `books` table exists before inserting
+db.execute(
+    text(
+        """
+        CREATE TABLE IF NOT EXISTS books (
+            isbn TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            author TEXT,
+            year TEXT
+        )
+        """
+    )
+)
+db.commit()
 
 seen_isbns = set()
 total = 0

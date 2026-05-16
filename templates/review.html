@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Index
+    Review
 {% endblock %}
 
 {% block main %}
@@ -23,16 +23,21 @@
             <td>{{ year }}</td>
         </tr>
     </table>
-    
+
     <form action="/review/{{ isbn }}" method="post">
-        <select class="custom-select" name="review">
-            <option selected>How would you rate this book</option>
-            <option value="1">One Star</option>
-            <option value="2">Two Stars</option>
-            <option value="3">Three Stars</option>
-            <option value="4">Four Stars</option>
-            <option value="5">Five Stars</option>
-        </select>
+        <div class="form-group">
+            <select class="custom-select" name="rating">
+                <option selected>How would you rate this book?</option>
+                <option value="1">One Star</option>
+                <option value="2">Two Stars</option>
+                <option value="3">Three Stars</option>
+                <option value="4">Four Stars</option>
+                <option value="5">Five Stars</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" name="comments" placeholder="Leave a comment (optional)" rows="3"></textarea>
+        </div>
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
 
@@ -43,17 +48,24 @@
             <tr>
                 <th>Username</th>
                 <th>Stars</th>
+                <th>Comments</th>
             </tr>
         </thead>
         <tfoot>
             <tr>
                 <th>Average Rating</th>
                 <th>{{ averageRating }}</th>
+                <th></th>
             </tr>
         </tfoot>
-        <tr>
-            <td>{{ username }}</td>
-            <td>{{ review }}</td>
-        </tr>
+        <tbody>
+            {% for r in reviews %}
+            <tr>
+                <td>{{ r[0] }}</td>
+                <td>{{ r[2] }}</td>
+                <td>{{ r[3] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 {% endblock %}

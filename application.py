@@ -1,12 +1,17 @@
 import os
-from flask import Flask, session, render_template, request, redirect
+from flask import Flask, session, render_template, request, redirect, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from helpers import login_required, apology
 from werkzeug.security import check_password_hash, generate_password_hash
 import requests
-import json
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 app = Flask(__name__)
 
@@ -114,7 +119,7 @@ def api(isbn):
     result = db.execute(text("SELECT * FROM books WHERE isbn=:isbn"), {'isbn': isbn}).fetchone()
 
     if not result:
-        return apology("Invalid ISBN")
+        return jsonify({"error": "Invalid ISBN"}), 404
 
     res = requests.get("https://openlibrary.org/search.json", params={"isbn": isbn, "fields": "ratings_count,ratings_average"})
     data = res.json()
@@ -126,8 +131,8 @@ def api(isbn):
         review_count = 0
         average_score = 0
 
-    return json.dumps({'title': result[1], 'author': result[2], 'year': result[3], 'isbn': result[0],
-                       'review_count': review_count, 'average_score': average_score}, sort_keys=False)
+    return jsonify({'title': result[1], 'author': result[2], 'year': result[3], 'isbn': result[0],
+                    'review_count': review_count, 'average_score': average_score})
 
 
 @app.route("/review/<isbn>", methods=['GET', 'POST'])
@@ -150,13 +155,12 @@ def review(isbn):
             db.execute(text("UPDATE reviews SET rating=:rating, comments=:comments WHERE username=:username AND isbn=:isbn"), {'rating': rating, 'comments': comments, 'username': session['username'], 'isbn': result[0]})
         db.commit()
 
-        allReviews = db.execute(text("SELECT * FROM reviews WHERE isbn=:isbn"), {'isbn': result[0]}).fetchall()
-        allRatings = [int(i[2]) for i in allReviews if i[2] is not None]
-        averageRating = "{0:0.1f}".format(sum(allRatings) / len(allRatings)) if allRatings else "N/A"
+    allReviews = db.execute(text("SELECT * FROM reviews WHERE isbn=:isbn"), {'isbn': result[0]}).fetchall()
+    allRatings = [int(i[2]) for i in allReviews if i[2] is not None]
+    averageRating = "{0:0.1f}".format(sum(allRatings) / len(allRatings)) if allRatings else "N/A"
 
-        return render_template("review.html", isbn=result[0], title=result[1], author=result[2], year=result[3], averageRating=averageRating, username=session['username'], reviews=allReviews)
-    else:
-        return render_template("review.html", isbn=result[0], title=result[1], author=result[2], year=result[3])
+    return render_template("review.html", isbn=result[0], title=result[1], author=result[2], year=result[3],
+                           averageRating=averageRating, reviews=allReviews)
 
 if __name__ == '__main__':
     app.run(debug=True)

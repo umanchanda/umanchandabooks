@@ -1,6 +1,5 @@
 import os
 from flask import Flask, session, render_template, request, redirect, jsonify
-from flask_session import Session
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from helpers import login_required, apology
@@ -22,13 +21,12 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+if not os.getenv("SECRET_KEY"):
+    raise RuntimeError("SECRET_KEY is not set")
 if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
 
-# Configure session to use filesystem
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
+app.secret_key = os.getenv("SECRET_KEY")
 
 # Set up database — normalize postgres:// to postgresql:// for SQLAlchemy 1.4+
 database_url = os.getenv("DATABASE_URL")

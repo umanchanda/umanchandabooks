@@ -33,7 +33,7 @@ app.secret_key = os.getenv("SECRET_KEY")
 database_url = os.getenv("DATABASE_URL")
 if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
-engine = create_engine(database_url)
+engine = create_engine(database_url, pool_pre_ping=True)
 db = scoped_session(sessionmaker(bind=engine))
 
 try:
@@ -62,8 +62,10 @@ try:
     """))
     db.execute(text("ALTER TABLE books ADD COLUMN IF NOT EXISTS genre TEXT"))
     db.commit()
-except IntegrityError:
+except Exception:
     db.rollback()
+finally:
+    db.remove()
 
 
 @app.route("/", methods=['GET', 'POST'])

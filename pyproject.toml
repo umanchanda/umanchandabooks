@@ -1,0 +1,14 @@
+[project]
+name = "umanchandabooks"
+version = "0.1.0"
+description = "Flask book review app backed by PostgreSQL"
+requires-python = ">=3.11"
+dependencies = [
+    "eventlet>=0.41.0",
+    "flask>=3.1.3",
+    "flask-session>=0.8.0",
+    "gunicorn>=26.0.0",
+    "psycopg2-binary>=2.9.12",
+    "requests>=2.34.1",
+    "sqlalchemy>=2.0.49",
+]

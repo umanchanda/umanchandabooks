@@ -1,13 +1,67 @@
-from sqlalchemy import create_engine
+import os
+import time
+import requests
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
-import csv
 
-engine = create_engine("postgres://wzhyqownmxotta:996a486a693a09dc9427b75e4787782c71f51ee2416c860b0f753f0dcaadc097@ec2-107-20-250-113.compute-1.amazonaws.com:5432/d3lpaali8o0um2")
+SUBJECTS = [
+    'fiction', 'science_fiction', 'mystery', 'biography',
+    'history', 'fantasy', 'romance', 'thriller', 'horror',
+    'poetry', 'philosophy', 'science', 'travel', 'cooking',
+]
+BOOKS_PER_SUBJECT = 400
+
+if not os.getenv("DATABASE_URL"):
+    raise RuntimeError("DATABASE_URL is not set")
+
+database_url = os.getenv("DATABASE_URL")
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+engine = create_engine(database_url)
 db = scoped_session(sessionmaker(bind=engine))
 
-with open('books.csv', 'r') as books:
-    reader = csv.reader(books)
-    next(reader)
-    for row in reader:
-        db.execute("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)", {'isbn': row[0], 'title':row[1], 'author': row[2], 'year': row[3]})
+seen_isbns = set()
+total = 0
+
+for subject in SUBJECTS:
+    print(f"Fetching subject: {subject}")
+    res = requests.get(
+        "https://openlibrary.org/search.json",
+        params={
+            "subject": subject,
+            "fields": "isbn,title,author_name,first_publish_year",
+            "limit": BOOKS_PER_SUBJECT,
+        },
+        timeout=15,
+    )
+    res.raise_for_status()
+
+    for doc in res.json().get("docs", []):
+        isbns = doc.get("isbn", [])
+        if not isbns:
+            continue
+        isbn = isbns[0]
+        if isbn in seen_isbns:
+            continue
+
+        title = doc.get("title", "")
+        authors = doc.get("author_name", [])
+        author = authors[0] if authors else "Unknown"
+        year = str(doc.get("first_publish_year", ""))
+
+        if not all([isbn, title, year]):
+            continue
+
+        seen_isbns.add(isbn)
+        db.execute(
+            text("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year) ON CONFLICT (isbn) DO NOTHING"),
+            {"isbn": isbn, "title": title, "author": author, "year": year},
+        )
+        total += 1
+
     db.commit()
+    print(f"  {total} books inserted so far")
+    time.sleep(1)  # be polite to Open Library's API
+
+print(f"Done. {total} books inserted.")

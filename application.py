@@ -35,6 +35,23 @@ if database_url.startswith("postgres://"):
 engine = create_engine(database_url)
 db = scoped_session(sessionmaker(bind=engine))
 
+db.execute(text("""
+    CREATE TABLE IF NOT EXISTS users (
+        username TEXT PRIMARY KEY,
+        password TEXT NOT NULL
+    )
+"""))
+db.execute(text("""
+    CREATE TABLE IF NOT EXISTS reviews (
+        username TEXT NOT NULL REFERENCES users(username),
+        isbn     TEXT NOT NULL REFERENCES books(isbn),
+        rating   INTEGER,
+        comments TEXT,
+        PRIMARY KEY (username, isbn)
+    )
+"""))
+db.commit()
+
 
 @app.route("/", methods=['GET', 'POST'])
 @login_required

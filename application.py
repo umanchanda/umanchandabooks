@@ -1,6 +1,7 @@
 import os
 from flask import Flask, session, render_template, request, redirect, jsonify
 from sqlalchemy import create_engine, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import scoped_session, sessionmaker
 from helpers import login_required, apology
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -35,30 +36,33 @@ if database_url.startswith("postgres://"):
 engine = create_engine(database_url)
 db = scoped_session(sessionmaker(bind=engine))
 
-db.execute(text("""
-    CREATE TABLE IF NOT EXISTS books (
-        isbn   TEXT PRIMARY KEY,
-        title  TEXT NOT NULL,
-        author TEXT,
-        year   TEXT
-    )
-"""))
-db.execute(text("""
-    CREATE TABLE IF NOT EXISTS users (
-        username TEXT PRIMARY KEY,
-        password TEXT NOT NULL
-    )
-"""))
-db.execute(text("""
-    CREATE TABLE IF NOT EXISTS reviews (
-        username TEXT NOT NULL REFERENCES users(username),
-        isbn     TEXT NOT NULL REFERENCES books(isbn),
-        rating   INTEGER,
-        comments TEXT,
-        PRIMARY KEY (username, isbn)
-    )
-"""))
-db.commit()
+try:
+    db.execute(text("""
+        CREATE TABLE IF NOT EXISTS books (
+            isbn   TEXT PRIMARY KEY,
+            title  TEXT NOT NULL,
+            author TEXT,
+            year   TEXT
+        )
+    """))
+    db.execute(text("""
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password TEXT NOT NULL
+        )
+    """))
+    db.execute(text("""
+        CREATE TABLE IF NOT EXISTS reviews (
+            username TEXT NOT NULL REFERENCES users(username),
+            isbn     TEXT NOT NULL REFERENCES books(isbn),
+            rating   INTEGER,
+            comments TEXT,
+            PRIMARY KEY (username, isbn)
+        )
+    """))
+    db.commit()
+except IntegrityError:
+    db.rollback()
 
 
 @app.route("/", methods=['GET', 'POST'])

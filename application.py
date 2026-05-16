@@ -36,6 +36,14 @@ engine = create_engine(database_url)
 db = scoped_session(sessionmaker(bind=engine))
 
 db.execute(text("""
+    CREATE TABLE IF NOT EXISTS books (
+        isbn   TEXT PRIMARY KEY,
+        title  TEXT NOT NULL,
+        author TEXT,
+        year   TEXT
+    )
+"""))
+db.execute(text("""
     CREATE TABLE IF NOT EXISTS users (
         username TEXT PRIMARY KEY,
         password TEXT NOT NULL

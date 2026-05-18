@@ -52,3 +52,15 @@ def review(isbn):
         averageRating=average_rating,
         reviews=all_reviews,
     )
+
+
+@reviews.route("/review/<isbn>/delete", methods=["POST"])
+@login_required
+def delete_review(isbn):
+    db.execute(
+        text("DELETE FROM reviews WHERE username=:u AND isbn=:isbn"),
+        {"u": session["username"], "isbn": isbn},
+    )
+    db.commit()
+    from flask import redirect
+    return redirect(f"/review/{isbn}")

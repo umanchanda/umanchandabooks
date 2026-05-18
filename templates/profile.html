@@ -37,9 +37,17 @@
                             <div class="profile-book-title">{{ r[3] }}</div>
                             <div class="profile-book-author">{{ r[4] or 'Unknown author' }}{% if r[5] %} &middot; {{ r[5] }}{% endif %}</div>
                         </div>
-                        <a href="/review/{{ r[0] }}" class="btn-outline-accent ms-3 flex-shrink-0">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> View
-                        </a>
+                        <div class="d-flex gap-2 ms-3 flex-shrink-0">
+                            <a href="/review/{{ r[0] }}" class="btn-outline-accent">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> View
+                            </a>
+                            <form action="/review/{{ r[0] }}/delete" method="post"
+                                  onsubmit="return confirm('Delete your review of {{ r[3]|replace(&quot;'&quot;, &quot;\\'&quot;) }}?')">
+                                <button type="submit" class="btn-delete">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     {% if r[1] %}
                     <div class="stars mt-2">

@@ -68,13 +68,23 @@
             {% if reviews %}
                 {% for r in reviews %}
                 <div class="review-item">
-                    <div class="d-flex align-items-center">
-                        <span class="reviewer">{{ r[0] }}</span>
-                        {% if r[2] %}
-                        <span class="stars">
-                            {% for i in range(r[2]|int) %}&#9733;{% endfor %}
-                            {% for i in range(5 - r[2]|int) %}&#9734;{% endfor %}
-                        </span>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <span class="reviewer">{{ r[0] }}</span>
+                            {% if r[2] %}
+                            <span class="stars">
+                                {% for i in range(r[2]|int) %}&#9733;{% endfor %}
+                                {% for i in range(5 - r[2]|int) %}&#9734;{% endfor %}
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% if session.username == r[0] %}
+                        <form action="/review/{{ isbn }}/delete" method="post"
+                              onsubmit="return confirm('Delete your review?')">
+                            <button type="submit" class="btn-delete">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
                         {% endif %}
                     </div>
                     {% if r[3] %}

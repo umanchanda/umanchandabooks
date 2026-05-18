@@ -433,6 +433,54 @@ body {
     text-decoration: none;
 }
 
+/* ── Profile page ── */
+.profile-header-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.75rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    font-size: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.profile-username {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: .35rem;
+}
+.profile-stats {
+    display: flex;
+    gap: 1.25rem;
+    font-size: .85rem;
+    color: var(--color-muted);
+    flex-wrap: wrap;
+}
+.profile-book-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+}
+.profile-book-author {
+    font-size: .85rem;
+    color: var(--color-muted);
+    margin-top: .1rem;
+}
+
 /* ── Footer ── */
 footer {
     border-top: 1px solid var(--color-border);

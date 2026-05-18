@@ -70,6 +70,31 @@ def logout():
     return redirect("/")
 
 
+@auth.route("/profile")
+@login_required
+def profile():
+    user_reviews = db.execute(
+        text("""
+            SELECT r.isbn, r.rating, r.comments, b.title, b.author, b.year
+            FROM reviews r
+            JOIN books b ON b.isbn = r.isbn
+            WHERE r.username = :u
+            ORDER BY b.title
+        """),
+        {"u": session["username"]},
+    ).fetchall()
+
+    ratings = [r[1] for r in user_reviews if r[1] is not None]
+    average = "{:.1f}".format(sum(ratings) / len(ratings)) if ratings else None
+
+    return render_template(
+        "profile.html",
+        username=session["username"],
+        reviews=user_reviews,
+        average=average,
+    )
+
+
 @auth.route("/change-password", methods=["GET", "POST"])
 @login_required
 def change_password():

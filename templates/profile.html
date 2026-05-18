@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %}— Profile{% endblock %}
+
+{% block main %}
+<div class="content-section">
+    <div class="container" style="max-width: 760px;">
+
+        <!-- Profile header -->
+        <div class="profile-header-card">
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="profile-info">
+                <div class="profile-username">{{ username }}</div>
+                <div class="profile-stats">
+                    <span><i class="fa-solid fa-star me-1"></i>{{ reviews|length }} review{{ 's' if reviews|length != 1 else '' }}</span>
+                    {% if average %}
+                    <span><i class="fa-solid fa-chart-bar me-1"></i>{{ average }} avg rating given</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews list -->
+        <div class="reviews-section">
+            <h3>
+                <i class="fa-solid fa-pen-to-square me-2"></i>My Reviews
+                <span class="text-muted fw-normal fs-6">({{ reviews|length }})</span>
+            </h3>
+
+            {% if reviews %}
+                {% for r in reviews %}
+                <div class="review-item">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div>
+                            <div class="profile-book-title">{{ r[3] }}</div>
+                            <div class="profile-book-author">{{ r[4] or 'Unknown author' }}{% if r[5] %} &middot; {{ r[5] }}{% endif %}</div>
+                        </div>
+                        <a href="/review/{{ r[0] }}" class="btn-outline-accent ms-3 flex-shrink-0">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> View
+                        </a>
+                    </div>
+                    {% if r[1] %}
+                    <div class="stars mt-2">
+                        {% for i in range(r[1]|int) %}&#9733;{% endfor %}
+                        {% for i in range(5 - r[1]|int) %}&#9734;{% endfor %}
+                        <span class="ms-1 text-muted" style="font-size:.8rem;">{{ r[1] }}/5</span>
+                    </div>
+                    {% endif %}
+                    {% if r[2] %}
+                    <div class="comment mt-1">{{ r[2] }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">You haven't written any reviews yet. <a href="/" style="color:var(--color-accent);font-weight:600;text-decoration:none;">Find a book</a> to get started.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
